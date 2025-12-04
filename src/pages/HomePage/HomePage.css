@@ -5,3 +5,17 @@
 .backgroud-faded-up {
     background-image: linear-gradient(180deg, transparent 0, RGBA(6, 6, 19, 0.03) 7%, RGBA(6, 6, 19, 0.11) 21%, RGBA(6, 6, 19, 0.8) 77%, RGBA(6, 6, 19, 1))
 }
+
+/* Hero section image styles */
+.HomePage .position-relative img {
+    display: block;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+/* Fallback background for hero section */
+.HomePage .position-relative {
+    background-color: #060613;
+    overflow: hidden;
+}

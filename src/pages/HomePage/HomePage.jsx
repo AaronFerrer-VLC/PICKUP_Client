@@ -21,6 +21,7 @@ const HomePage = () => {
   const [mostReviewedMovies, setMostReviewedMovies] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [imageError, setImageError] = useState(false)
   const { loggedUser } = useContext(AuthContext)
 
   useEffect(() => {
@@ -77,7 +78,22 @@ const HomePage = () => {
     <div className="HomePage">
                 <Row>
                     <Col className="position-relative" style={{ height: "30rem" }}>
-                        <img className="w-100 h-100 object-fit-cover opacity-100" src={homeCover} alt="Home Cover" />
+                        {!imageError ? (
+                            <img 
+                                className="w-100 h-100 object-fit-cover opacity-100" 
+                                src={homeCover} 
+                                alt="PICKUP - Conecta con cinéfilos" 
+                                onError={() => setImageError(true)}
+                                loading="eager"
+                            />
+                        ) : (
+                            <div className="w-100 h-100 bg-dark d-flex align-items-center justify-content-center">
+                                <div className="text-center text-white">
+                                    <h2>PICKUP</h2>
+                                    <p>La web de cinéfilos para cinéfilos</p>
+                                </div>
+                            </div>
+                        )}
                         <div className="w-100 backgroud-faded-down position-absolute top-0" style={{ height: "30%" }} />
                         <div className="w-100 backgroud-faded-up position-absolute bottom-0" style={{ height: "30%" }} />
                         <div className="p-5 w-100 top-50 start-50 translate-middle position-absolute text-center">

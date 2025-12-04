@@ -27,9 +27,20 @@ const HomePage = () => {
 
   // Preload image to check if it loads correctly
   useEffect(() => {
+    if (!homeCover) {
+      setImageError(true)
+      return
+    }
+    
     const img = new Image()
-    img.onload = () => setImageLoaded(true)
-    img.onerror = () => setImageError(true)
+    img.onload = () => {
+      setImageLoaded(true)
+      setImageError(false)
+    }
+    img.onerror = () => {
+      setImageError(true)
+      setImageLoaded(false)
+    }
     img.src = homeCover
   }, [])
 
@@ -87,6 +98,7 @@ const HomePage = () => {
     <div className="HomePage">
                 <Row>
                     <Col className="position-relative hero-section" style={{ height: "30rem" }}>
+                        {/* Background image layer */}
                         <div 
                             className="hero-background"
                             style={{
@@ -100,18 +112,30 @@ const HomePage = () => {
                                 top: 0,
                                 left: 0,
                                 zIndex: 0,
-                                opacity: imageLoaded ? 1 : 0,
+                                opacity: imageLoaded && !imageError ? 1 : 0,
                                 transition: 'opacity 0.3s ease-in-out'
                             }}
+                            aria-hidden="true"
                         />
-                        {imageError && (
-                            <div className="w-100 h-100 bg-dark d-flex align-items-center justify-content-center position-absolute" style={{ zIndex: 0 }}>
-                                <div className="text-center text-white">
-                                    <h2>PICKUP</h2>
-                                    <p>La web de cinéfilos para cinéfilos</p>
-                                </div>
-                            </div>
+                        {/* Dark overlay to hide any watermark in the image */}
+                        <div 
+                            className="hero-overlay"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                zIndex: 0,
+                                backgroundColor: 'rgba(6, 6, 19, 0.3)',
+                                pointerEvents: 'none'
+                            }}
+                        />
+                        {/* Fallback solo se muestra si la imagen falla completamente */}
+                        {imageError && !imageLoaded && (
+                            <div className="w-100 h-100 bg-dark position-absolute" style={{ zIndex: 0 }} />
                         )}
+                        {/* Gradient overlays */}
                         <div className="w-100 backgroud-faded-down position-absolute top-0" style={{ height: "30%", zIndex: 1 }} />
                         <div className="w-100 backgroud-faded-up position-absolute bottom-0" style={{ height: "30%", zIndex: 1 }} />
                         <div className="p-5 w-100 top-50 start-50 translate-middle position-absolute text-center" style={{ zIndex: 2 }}>

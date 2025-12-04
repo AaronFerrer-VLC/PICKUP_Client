@@ -10,16 +10,21 @@
 .hero-section {
     background-color: #060613;
     overflow: hidden;
+    position: relative;
 }
 
 .hero-background {
     display: block;
     width: 100%;
     height: 100%;
-    /* Ensure no text appears */
+    /* Ensure no text appears - completely hide any text content */
     text-indent: -9999px;
     font-size: 0;
     line-height: 0;
+    color: transparent;
+    /* Prevent any text rendering */
+    user-select: none;
+    pointer-events: none;
 }
 
 /* Ensure no alt text or placeholder text is visible */
@@ -29,11 +34,15 @@
     text-indent: -9999px;
     font-size: 0;
     overflow: hidden;
+    color: transparent;
+    content: none;
 }
 
-/* Hide any potential text content */
-.hero-section * {
-    text-indent: 0;
+/* Hide any potential text content in hero section */
+.hero-section .hero-background {
+    text-indent: -9999px;
+    font-size: 0;
+    line-height: 0;
 }
 
 /* Ensure background image covers properly */
@@ -41,4 +50,49 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    /* Ensure no text can appear */
+    text-decoration: none;
+    text-transform: none;
+}
+
+/* Additional safeguard - hide any pseudo-elements */
+.hero-section::before,
+.hero-section::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Ensure hero section content is above background */
+.hero-section > * {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-section .hero-background {
+    z-index: 0;
+}
+
+/* Dark overlay to hide watermarks in background image */
+.hero-overlay {
+    z-index: 0;
+    background-color: rgba(6, 6, 19, 0.3);
+    pointer-events: none;
+}
+
+/* Hide any watermark or overlay text that might be in the image */
+.hero-background::before,
+.hero-background::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Ensure text content is always on top */
+.hero-section .position-absolute:not(.hero-background):not(.hero-overlay) {
+    z-index: 2;
+}
+
+/* Ensure gradients are above background but below text */
+.hero-section .backgroud-faded-down,
+.hero-section .backgroud-faded-up {
+    z-index: 1;
 }

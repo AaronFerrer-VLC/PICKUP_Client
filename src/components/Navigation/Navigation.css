@@ -98,3 +98,30 @@
 .profile-toggle::after {
     display: none;
 }
+
+/* Logo styles */
+.navbar-logo {
+    max-width: 120px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.navbar-logo-fallback {
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+
+.navbar-logo-fallback:hover {
+    color: rgb(5 255 161);
+    text-decoration: none;
+}
+
+/* Ensure logo container has proper sizing */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+}

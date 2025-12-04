@@ -18,6 +18,7 @@ const Navigation = () => {
     const [showOffCanvas, setShowOffCanvas] = useState(false)
     const [showFilter, setShowFilter] = useState(false)
     const [expanded, setExpanded] = useState(false)
+    const [logoError, setLogoError] = useState(false)
 
     const toggleSearchFilter = () => setShowFilter(prevState => !prevState)
 
@@ -35,11 +36,16 @@ const Navigation = () => {
                             {clickToggle ? <XLg className='fs-1 fw-bold' /> : <List className='fs-1 fw-bold' />}
                         </Navbar.Toggle>
                         <Navbar.Brand as={Link} to="/">
-                            <img
-                                alt="Logo"
-                                src={logo}
-                                width="100"
-                            />
+                            {logoError ? (
+                                <span className="navbar-logo-fallback">PICKUP</span>
+                            ) : (
+                                <img
+                                    alt="PICKUP Logo"
+                                    src={logo}
+                                    className="navbar-logo"
+                                    onError={() => setLogoError(true)}
+                                />
+                            )}
                         </Navbar.Brand>
                     </Nav>
                     <Navbar.Collapse id="basic-navbar-nav d-flex w-100">

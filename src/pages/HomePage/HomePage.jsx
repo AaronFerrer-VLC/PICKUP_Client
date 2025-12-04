@@ -22,7 +22,16 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [imageError, setImageError] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
   const { loggedUser } = useContext(AuthContext)
+
+  // Preload image to check if it loads correctly
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => setImageLoaded(true)
+    img.onerror = () => setImageError(true)
+    img.src = homeCover
+  }, [])
 
   useEffect(() => {
     fetchAllData()
@@ -77,26 +86,35 @@ const HomePage = () => {
   return (
     <div className="HomePage">
                 <Row>
-                    <Col className="position-relative" style={{ height: "30rem" }}>
-                        {!imageError ? (
-                            <img 
-                                className="w-100 h-100 object-fit-cover opacity-100" 
-                                src={homeCover} 
-                                alt="PICKUP - Conecta con cinéfilos" 
-                                onError={() => setImageError(true)}
-                                loading="eager"
-                            />
-                        ) : (
-                            <div className="w-100 h-100 bg-dark d-flex align-items-center justify-content-center">
+                    <Col className="position-relative hero-section" style={{ height: "30rem" }}>
+                        <div 
+                            className="hero-background"
+                            style={{
+                                backgroundImage: imageError ? 'none' : `url(${homeCover})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                backgroundRepeat: 'no-repeat',
+                                width: '100%',
+                                height: '100%',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                zIndex: 0,
+                                opacity: imageLoaded ? 1 : 0,
+                                transition: 'opacity 0.3s ease-in-out'
+                            }}
+                        />
+                        {imageError && (
+                            <div className="w-100 h-100 bg-dark d-flex align-items-center justify-content-center position-absolute" style={{ zIndex: 0 }}>
                                 <div className="text-center text-white">
                                     <h2>PICKUP</h2>
                                     <p>La web de cinéfilos para cinéfilos</p>
                                 </div>
                             </div>
                         )}
-                        <div className="w-100 backgroud-faded-down position-absolute top-0" style={{ height: "30%" }} />
-                        <div className="w-100 backgroud-faded-up position-absolute bottom-0" style={{ height: "30%" }} />
-                        <div className="p-5 w-100 top-50 start-50 translate-middle position-absolute text-center">
+                        <div className="w-100 backgroud-faded-down position-absolute top-0" style={{ height: "30%", zIndex: 1 }} />
+                        <div className="w-100 backgroud-faded-up position-absolute bottom-0" style={{ height: "30%", zIndex: 1 }} />
+                        <div className="p-5 w-100 top-50 start-50 translate-middle position-absolute text-center" style={{ zIndex: 2 }}>
                             <h1 className="text-center fw-bold">Conecta, comparte y crea con cinéfilos de todo el mundo</h1>
                             <p className="text-center fs-5"> La web de cinéfilos para cinéfilos que estábais esperando </p>
                             {

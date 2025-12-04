@@ -6,16 +6,39 @@
     background-image: linear-gradient(180deg, transparent 0, RGBA(6, 6, 19, 0.03) 7%, RGBA(6, 6, 19, 0.11) 21%, RGBA(6, 6, 19, 0.8) 77%, RGBA(6, 6, 19, 1))
 }
 
-/* Hero section image styles */
-.HomePage .position-relative img {
-    display: block;
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-}
-
-/* Fallback background for hero section */
-.HomePage .position-relative {
+/* Hero section styles */
+.hero-section {
     background-color: #060613;
     overflow: hidden;
+}
+
+.hero-background {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Ensure no text appears */
+    text-indent: -9999px;
+    font-size: 0;
+    line-height: 0;
+}
+
+/* Ensure no alt text or placeholder text is visible */
+.hero-section img,
+.hero-section::before,
+.hero-section::after {
+    text-indent: -9999px;
+    font-size: 0;
+    overflow: hidden;
+}
+
+/* Hide any potential text content */
+.hero-section * {
+    text-indent: 0;
+}
+
+/* Ensure background image covers properly */
+.hero-background {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }

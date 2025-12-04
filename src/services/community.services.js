@@ -1,24 +1,10 @@
-
-import axios from 'axios'
+import ApiService from './api.service'
 
 class CommunityServices {
-
-    constructor() {
-        this.axiosApp = axios.create({
-            baseURL: `${import.meta.env.VITE_APP_API_URL}/api/communities`
-        })
-
-        this.axiosApp.interceptors.request.use(config => {
-
-            const storedToken = localStorage.getItem('authToken')
-
-            if (storedToken) {
-                config.headers = { Authorization: `Bearer ${storedToken}` }
-            }
-
-            return config
-        })
-    }
+  constructor() {
+    const apiService = new ApiService(`${import.meta.env.VITE_APP_API_URL}/api/communities`)
+    this.axiosApp = apiService.getInstance()
+  }
 
     fetchOneCommunity(id) {
         return this.axiosApp.get(`/${id}`)

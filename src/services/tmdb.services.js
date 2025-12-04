@@ -1,12 +1,10 @@
-import axios from 'axios'
+import ApiService from './api.service'
 
 class TMDBServices {
-
-    constructor() {
-        this.axiosApp = axios.create({
-            baseURL: `${import.meta.env.VITE_APP_API_URL}/api`,
-        })
-    }
+  constructor() {
+    const apiService = new ApiService(`${import.meta.env.VITE_APP_API_URL}/api`)
+    this.axiosApp = apiService.getInstance()
+  }
 
     fetchPersonFilter(query) {
         return this.axiosApp.get(`/persons/search/${query}`)

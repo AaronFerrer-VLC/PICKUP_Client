@@ -1,13 +1,10 @@
-import axios from 'axios'
+import ApiService from './api.service'
 
 class UploadServices {
-
-    constructor() {
-
-        this.api = axios.create({
-            baseURL: `${import.meta.env.VITE_APP_API_URL}/api/upload`
-        })
-    }
+  constructor() {
+    const apiService = new ApiService(`${import.meta.env.VITE_APP_API_URL}/api/upload`)
+    this.api = apiService.getInstance()
+  }
 
     uploadimage(imageForm) {
         return this.api.post('/image', imageForm)

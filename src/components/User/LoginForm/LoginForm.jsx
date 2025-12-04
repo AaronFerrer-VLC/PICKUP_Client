@@ -26,16 +26,18 @@ const LoginForm = () => {
         authServices
             .loginUser(loginData)
             .then(({ data }) => {
+                const { authToken } = data
 
-                const { authToken, _id } = data
-
+                // Security: Only store token, not user ID
                 localStorage.setItem('authToken', authToken)
-                localStorage.setItem('userId', _id)
 
                 authenticateUser()
+                navigate('/')
             })
-            .then(() => navigate('/'))
-            .catch(err => console.log(err))
+            .catch(err => {
+                console.error('Login error:', err)
+                // You could set an error state here to show to the user
+            })
     }
 
     return (

@@ -13,7 +13,7 @@ const MovieImage = ({ movieApiId }) => {
                 const data = await response.json()
                 return data
             } catch (err) {
-                console.err('Error fetching movie details:', err)
+                console.error('Error fetching movie details:', err)
                 throw err
             }
         }
@@ -28,7 +28,7 @@ const MovieImage = ({ movieApiId }) => {
                 }
             } catch (error) {
                 setError(error.message)
-                console.err('Error fetching movie details:', err)
+                console.error('Error fetching movie details:', error)
             }
         }
 

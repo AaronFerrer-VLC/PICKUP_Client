@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Form, Button } from "react-bootstrap"
 import { useNavigate, useParams } from "react-router-dom"
 import userService from "../../../services/user.services"
+import UploadServices from "../../../services/upload.services"
 import { genres } from "../../../const/forms-constants"
 
 const EditUserForm = () => {

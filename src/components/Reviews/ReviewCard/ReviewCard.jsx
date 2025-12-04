@@ -75,11 +75,18 @@ const ReviewCard = ({ _id, content, rate, likesCounter, createdAt, movieApiId, a
     }
 
     const handleReviewDelete = () => {
-
-        ReviewServices
-            .deleteReview(_id)
-            .then(() => location.reload())
-            .catch(err => console.log(err))
+        if (window.confirm('¿Estás seguro de que deseas eliminar esta reseña?')) {
+            ReviewServices
+                .deleteReview(_id)
+                .then(() => {
+                    // Use window.location only as fallback, prefer React Router navigation
+                    window.location.reload()
+                })
+                .catch(err => {
+                    console.error('Error deleting review:', err)
+                    alert('Error al eliminar la reseña. Por favor, intenta nuevamente.')
+                })
+        }
     }
 
     return (

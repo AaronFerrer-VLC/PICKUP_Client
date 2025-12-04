@@ -1,13 +1,18 @@
 import { Spinner } from "react-bootstrap"
 
-const Loader = () => {
-    return (
-        <div className="Loader d-flex justify-content-center align-items-center">
-            <Spinner animation="border" role="status">
-                <span className="visual-hidden"></span>
-            </Spinner>
-        </div>
-    )
+/**
+ * Loading component with optional message
+ * @param {string} message - Optional message to display below the spinner
+ */
+const Loader = ({ message }) => {
+  return (
+    <div className="Loader d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '200px' }}>
+      <Spinner animation="border" role="status" className="mb-3">
+        <span className="visually-hidden">Cargando...</span>
+      </Spinner>
+      {message && <p className="text-muted">{message}</p>}
+    </div>
+  )
 }
 
 export default Loader

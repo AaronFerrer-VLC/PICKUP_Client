@@ -1,19 +1,10 @@
-import axios from 'axios'
+import ApiService from './api.service'
 
 class UserServices {
-    constructor() {
-        this.axiosApp = axios.create({
-            baseURL: `${import.meta.env.VITE_APP_API_URL}/api/users`
-        });
-
-        this.axiosApp.interceptors.request.use(config => {
-            const storedToken = localStorage.getItem('authToken')
-            if (storedToken) {
-                config.headers = { Authorization: `Bearer ${storedToken}` }
-            }
-            return config
-        })
-    }
+  constructor() {
+    const apiService = new ApiService(`${import.meta.env.VITE_APP_API_URL}/api/users`)
+    this.axiosApp = apiService.getInstance()
+  }
 
     fetchUsers(page = 1, limit = 10) {
         return this.axiosApp.get(`/?page=${page}&limit=${limit}`)

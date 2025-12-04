@@ -15,46 +15,66 @@ import "./HomePage.css"
 
 const HomePage = () => {
 
-    const [communities, setCommunities] = useState([])
-    const [topCommunities, setTopCommunities] = useState([])
-    const [lastReviewdMovies, setLastReviewedMovies] = useState([])
-    const [mostReviewdMovies, setMostReviewedMovies] = useState([])
-    const { loggedUser, logoutUser } = useContext(AuthContext)
+  const [communities, setCommunities] = useState([])
+  const [topCommunities, setTopCommunities] = useState([])
+  const [lastReviewedMovies, setLastReviewedMovies] = useState([])
+  const [mostReviewedMovies, setMostReviewedMovies] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const { loggedUser } = useContext(AuthContext)
 
-    const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    fetchAllData()
+  }, [])
 
-    useEffect(() => {
-        fetchAllData()
-    }, [])
+  const fetchAllData = () => {
+    setIsLoading(true)
+    setError(null)
+
+    const promises = [
+      CommunityServices.fetchCommunities(),
+      CommunityServices.fetchMostFollowedCommunities(),
+      ReviewServices.getLastReviewedMovies(),
+      ReviewServices.getMostReviewedMovies()
+    ]
+
+    Promise
+      .all(promises)
+      .then(([communitiesRes, topCommunitiesRes, lastReviewedMoviesRes, mostReviewedMoviesRes]) => {
+        setCommunities(communitiesRes.data || [])
+        setTopCommunities(topCommunitiesRes.data || [])
+        setLastReviewedMovies(lastReviewedMoviesRes.data || [])
+        setMostReviewedMovies(mostReviewedMoviesRes.data || [])
+      })
+      .catch(err => {
+        console.error('Error fetching home page data:', err)
+        setError('Error al cargar los datos. Por favor, recarga la página.')
+      })
+      .finally(() => setIsLoading(false))
+  }
 
 
-    const fetchAllData = () => {
+  if (isLoading) {
+    return <Loader message="Cargando contenido..." />
+  }
 
-        const promises = [
-            CommunityServices.fetchCommunities(),
-            CommunityServices.fetchMostFollowedCommunities(),
-            ReviewServices.getLastReviewedMovies(),
-            ReviewServices.getMostReviewedMovies()
-        ]
-
-        Promise
-            .all(promises)
-            .then(([communities, topCommunites, lastReviewedMovies, mostReviewedMovies]) => {
-                setCommunities(communities.data)
-                setTopCommunities(topCommunites.data)
-                setLastReviewedMovies(lastReviewedMovies.data)
-                setMostReviewedMovies(mostReviewedMovies.data)
-            })
-            .then(() => setIsLoading(false))
-            .catch(err => console.log(err))
-    }
-
-
+  if (error) {
     return (
+      <div className="HomePage">
+        <Container>
+          <div className="alert alert-danger mt-4" role="alert">
+            {error}
+            <Button variant="outline-danger" className="ms-3" onClick={fetchAllData}>
+              Reintentar
+            </Button>
+          </div>
+        </Container>
+      </div>
+    )
+  }
 
-        isLoading ? <Loader /> :
-
-            <div className="HomePage">
+  return (
+    <div className="HomePage">
                 <Row>
                     <Col className="position-relative" style={{ height: "30rem" }}>
                         <img className="w-100 h-100 object-fit-cover opacity-100" src={homeCover} alt="Home Cover" />
@@ -74,7 +94,7 @@ const HomePage = () => {
                     <Row className="mt-3">
                         <Col>
                             <p className="ms-2 mb-4 fs-5 fw-bold">Últimas películas comentadas</p>
-                            <MoviesPostersList movies={lastReviewdMovies} />
+                            <MoviesPostersList movies={lastReviewedMovies} />
                         </Col>
                     </Row>
                     <Row className="mt-4">
@@ -86,7 +106,7 @@ const HomePage = () => {
                     <Row className="mt-4">
                         <Col>
                             <p className="ms-2 mb-4 fs-5 fw-bold">Películas más comentadas</p>
-                            <MoviesPostersList movies={mostReviewdMovies} />
+                            <MoviesPostersList movies={mostReviewedMovies} />
                         </Col>
                     </Row>
                     <Row className="mt-4">

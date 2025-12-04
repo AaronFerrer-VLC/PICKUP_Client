@@ -1,88 +1,119 @@
-import React, { useState, useEffect } from 'react'
-import { Modal, Form, Spinner, Row, Col, ListGroup, Button } from 'react-bootstrap'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { Modal, Form, Spinner, Row, Col, ListGroup } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import communityServices from '../../../services/community.services'
 import userServices from '../../../services/user.services'
 import reviewServices from '../../../services/review.services'
 import debounce from 'lodash.debounce'
 
-const TMDB_API_IMG_URL = import.meta.env.VITE_APP_TMDB_API_IMG_URL
-
 const GeneralFilter = ({ onResultsFound, setShowFilter }) => {
-    const [searchValue, setSearchValue] = useState('')
-    const [results, setResults] = useState({
-        communities: [],
-        users: [],
-        reviews: [],
-    });
-    const [isLoading, setIsLoading] = useState(false)
-    const navigate = useNavigate()
+  const [searchValue, setSearchValue] = useState('')
+  const [results, setResults] = useState({
+    communities: [],
+    users: [],
+    reviews: [],
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const navigate = useNavigate()
 
+  const fetchData = useCallback(
+    debounce(async (query) => {
+      if (!query || query.trim().length < 3) {
+        setResults({ communities: [], users: [], reviews: [] })
+        setIsLoading(false)
+        return
+      }
 
-    const fetchData = debounce(() => {
-        setIsLoading(true);
-        Promise.all([
-            communityServices.filterCommunities(searchValue),
-            userServices.filterUsers(searchValue),
-            reviewServices.filterReviews(searchValue),
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const [communityResults, userResults, reviewResults] = await Promise.all([
+          communityServices.filterCommunities(query),
+          userServices.filterUsers(query),
+          reviewServices.filterReviews(query),
         ])
-            .then(([communityResults, userResults, reviewResults]) => {
-                setResults({
-                    communities: communityResults.data,
-                    users: userResults.data,
-                    reviews: reviewResults.data,
-                })
-            })
-            .catch((err) => console.error(err))
-            .finally(() => setIsLoading(false))
-    }, 300)
 
-    useEffect(() => {
-        if (searchValue.length >= 3) {
-            fetchData()
-        }
-        return fetchData.cancel
-    }, [searchValue])
+        setResults({
+          communities: communityResults.data || [],
+          users: userResults.data || [],
+          reviews: reviewResults.data || [],
+        })
+      } catch (err) {
+        console.error('Search error:', err)
+        setError('Error al realizar la búsqueda. Por favor, intenta nuevamente.')
+        setResults({ communities: [], users: [], reviews: [] })
+      } finally {
+        setIsLoading(false)
+      }
+    }, 300),
+    []
+  )
+
+  useEffect(() => {
+    if (searchValue.length >= 3) {
+      fetchData(searchValue)
+    } else {
+      setResults({ communities: [], users: [], reviews: [] })
+    }
+
+    return () => {
+      fetchData.cancel?.()
+    }
+  }, [searchValue, fetchData])
 
     const handleSearchChange = (e) => {
         setSearchValue(e.target.value)
     }
 
-    const handleClick = (type, id) => {
-        if (type === 'community') navigate(`/comunidades/detalles/${id}`)
-        if (type === 'user') navigate(`/usuarios/${id}`)
-        if (type === 'review') navigate(`/reviews/detalles/${id}`)
-        setShowFilter(false)
+  const handleClick = useCallback((type, id) => {
+    const routes = {
+      community: `/comunidades/detalles/${id}`,
+      user: `/usuarios/${id}`,
+      review: `/reviews/${id}`
     }
 
-    const getHighlightedResult = () => {
-        const { communities, users, reviews } = results
-        if (communities.length > 0) return { type: 'community', data: communities[0] }
-        if (users.length > 0) return { type: 'user', data: users[0] }
-        if (reviews.length > 0) return { type: 'review', data: reviews[0] }
-        return null
+    const route = routes[type]
+    if (route) {
+      navigate(route)
+      setShowFilter(false)
     }
+  }, [navigate, setShowFilter])
 
+  const highlightedResult = useMemo(() => {
+    const { communities, users, reviews } = results
+    if (communities.length > 0) return { type: 'community', data: communities[0] }
+    if (users.length > 0) return { type: 'user', data: users[0] }
+    if (reviews.length > 0) return { type: 'review', data: reviews[0] }
+    return null
+  }, [results])
 
-    const highlightedResult = getHighlightedResult()
-
-    return (
-        <Modal show={true} onHide={() => setShowFilter(false)} centered size="lg">
-            <Modal.Header closeButton>
-                <Modal.Title>Buscar</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form>
-                    <Form.Control
-                        type="text"
-                        placeholder="Buscar comunidades, usuarios o reseñas..."
-                        value={searchValue}
-                        onChange={handleSearchChange}
-                    />
-                </Form>
-                {isLoading ? (
-                    <Spinner animation="border" className="mt-3" />
-                ) : (
+  return (
+    <Modal show={true} onHide={() => setShowFilter(false)} centered size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>Buscar</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form>
+          <Form.Control
+            type="text"
+            placeholder="Buscar comunidades, usuarios o reseñas..."
+            value={searchValue}
+            onChange={handleSearchChange}
+            autoFocus
+          />
+        </Form>
+        {error && (
+          <div className="alert alert-danger mt-3" role="alert">
+            {error}
+          </div>
+        )}
+        {isLoading ? (
+          <div className="d-flex justify-content-center mt-3">
+            <Spinner animation="border" />
+          </div>
+        ) : (
                     <Row className="mt-3">
                         {highlightedResult && (
                             <Col md={6}>
@@ -173,11 +204,11 @@ const GeneralFilter = ({ onResultsFound, setShowFilter }) => {
                                 )}
                             </ListGroup>
                         </Col>
-                    </Row>
-                )}
-            </Modal.Body>
-        </Modal>
-    );
+        </Row>
+        )}
+      </Modal.Body>
+    </Modal>
+  )
 }
 
 export default GeneralFilter

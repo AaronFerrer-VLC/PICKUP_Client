@@ -1,25 +1,10 @@
-import axios from 'axios'
+import ApiService from './api.service'
 
 class AuthServices {
-
-    constructor() {
-
-        this.axiosApp = axios.create({
-            baseURL: `${import.meta.env.VITE_APP_API_URL}/api`
-
-        })
-
-        this.axiosApp.interceptors.request.use(config => {
-
-            const storedToken = localStorage.getItem('authToken')
-
-            if (storedToken) {
-                config.headers = { Authorization: `Bearer ${storedToken}` }
-            }
-
-            return config
-        })
-    }
+  constructor() {
+    const apiService = new ApiService(`${import.meta.env.VITE_APP_API_URL}/api`)
+    this.axiosApp = apiService.getInstance()
+  }
 
     signupUser(userData) {
         return this.axiosApp.post('/signup', userData)

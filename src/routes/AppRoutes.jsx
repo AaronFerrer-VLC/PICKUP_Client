@@ -29,7 +29,9 @@ const AppRoutes = () => {
 
                 <Route path={'/comunidades'} element={<CommunitiesPage />} />
                 <Route path={'/comunidades/detalles/:communityId'} element={<CommunityDetailsPage />} />
-                <Route path={'/comunidades/crear'} element={<NewCommunityForm />} />
+                <Route element={<PrivateRoute />}>
+                  <Route path={'/comunidades/crear'} element={<NewCommunityForm />} />
+                </Route>
                 <Route path={'/top-comunidades'} element={<TopCommunitiesPage />} />
 
                 <Route path={'/registro'} element={<SignupPage />} />
